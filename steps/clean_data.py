@@ -4,7 +4,7 @@ from zenml import step
 
 
 @step
-def clean_data(data: pd.DataFrame) -> pd.DataFrame:
+def clean_data(data: pd.DataFrame) -> None:
     """
     Cleaning the data.
 
@@ -16,4 +16,5 @@ def clean_data(data: pd.DataFrame) -> pd.DataFrame:
     """
     logging.info("Cleaning data")
     # Dropping rows with missing values
-    return data.dropna()
+    
+    # return data.dropna()
