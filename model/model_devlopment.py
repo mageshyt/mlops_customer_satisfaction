@@ -26,12 +26,11 @@ class Model(ABC):
 
 
 
-class LinearRegression(Model):
+class LinearRegressionModel(Model):
     """
     Class for linear regression model development.
     """
 
-    @abstractmethod
     def train(self,x_train,y_train,**kwargs):
         """
         Develop the linear regression model.
@@ -54,12 +53,11 @@ class LinearRegression(Model):
         
 
 
-class RandomForest(Model):
+class RandomForestModel(Model):
     """
     Class for Random Forest model development.
     """
 
-    @abstractmethod
     def train(self,x_train,y_train,**kwargs):
         """
         Develop the Random Forest model.

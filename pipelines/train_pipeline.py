@@ -3,7 +3,7 @@ from zenml import pipeline
 from steps.ingest_data import ingest_data
 from steps.clean_data import clean_data
 from steps.model_train import model_train
-from steps.evaluation import evaluate
+from steps.evaluation import evaluate_model
 
 
 # Create a pipeline
@@ -18,12 +18,12 @@ def train_pipeline(data_path:str) -> None:
     """
     df=ingest_data(data_path) # Ingesting the data
     # Cleaning the data
-    clean_data(df) 
+    X_train,X_test,y_train,y_test= clean_data(df)
     # Training the model
-    model_train(df)
+    model=model_train(X_train,X_test,y_train,y_test)
 
-    # Evaluating the model
-    evaluate(df)
+    r2,mae,rmse,mse=evaluate_model(model,X_test,y_test)
+
 
 
 

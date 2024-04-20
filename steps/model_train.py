@@ -4,16 +4,16 @@ from zenml import  step
 
 import pandas as pd
 from sklearn.base import RegressorMixin
-from model.model_devlopment import LinearRegression,RandomForest
+from model.model_devlopment import LinearRegressionModel,RandomForestModel
 
-from  .config import ModelNameconfig
+from  .config import ModelNameConfig
 @step
 def model_train(
     X_train: pd.DataFrame,
     X_test: pd.DataFrame,
     y_train: pd.DataFrame,
     y_test: pd.DataFrame,
-    config:ModelNameconfig
+    config:ModelNameConfig
 ) -> RegressorMixin:
     """
     Training the model.
@@ -28,15 +28,15 @@ def model_train(
     # Training the model
     model=None
 
-    if config.model_type=="LinearRegression":
-        model=LinearRegression()
+    if config.model_name=="LinearRegression":
+        model=LinearRegressionModel()
         trained_mode=model.train(X_train,y_train)
 
         return trained_mode
 
-    elif config.model_type=="RandomForest":
-        model=RandomForest()
+    elif config.model_name=="RandomForest":
+        model=RandomForestModel()
         trained_mode=model.train(X_train,y_train)
         return trained_mode
     else:
-        raise ValueError(f"Invalid model type: {config.model_type}")
+        raise ValueError(f"Invalid model type: {config.model_name}")

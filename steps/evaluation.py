@@ -9,9 +9,9 @@ from model.model_evaluation import MAE, RMSE, R2,MSE
 from typing import Annotated, Tuple
 
 @step
-def evaluate(model:RegressorMixin,
+def evaluate_model(model:RegressorMixin,
                 X_test: pd.DataFrame,
-                y_test: pd.DataFrame,
+                y_test: pd.Series,
              ) -> Tuple[
                 Annotated[float, 'r2'],
                 Annotated[float, 'mae'],

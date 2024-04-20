@@ -96,7 +96,7 @@ class RMSE(Evaluation):
     Class for Root Mean Squared Error evaluation.
     """
 
-    def evaluate(self, model, y_true:np.ndarray, y_pred:np.ndarray):
+    def evaluate(self,  y_true:np.ndarray, y_pred:np.ndarray):
         """
         Evaluate the model using Root Mean Squared Error.
 
