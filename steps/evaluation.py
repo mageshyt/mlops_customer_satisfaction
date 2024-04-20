@@ -4,11 +4,15 @@ from zenml import step
 import pandas as pd
 from sklearn.base import RegressorMixin
 from model.model_evaluation import MAE, RMSE, R2,MSE
+import mlflow
 
+from zenml.client import Client
 
 from typing import Annotated, Tuple
+experiment_tracker = Client().active_stack.experiment_tracker
 
-@step
+
+@step(experiment_tracker=experiment_tracker.name)
 def evaluate_model(model:RegressorMixin,
                 X_test: pd.DataFrame,
                 y_test: pd.Series,
@@ -37,6 +41,12 @@ def evaluate_model(model:RegressorMixin,
         logging.info(f"Mean Absolute Error: {mae}")
         logging.info(f"Root Mean Squared Error: {rmse}")
         logging.info(f"R2: {r2}")
+
+        mlflow.log_metric("mae",mae)
+        mlflow.log_metric("rmse",rmse)
+        mlflow.log_metric("r2",r2)
+        mlflow.log_metric("mse",mse)
+        
 
         return r2,mae,rmse,mse
     
