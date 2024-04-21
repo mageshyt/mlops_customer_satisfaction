@@ -3,6 +3,9 @@ from PIL import Image
 
 st.set_page_config(page_title="Customer Satification", page_icon=":shark:", layout="wide")
 
+# create sidebar
+
+st.sidebar.markdown("# Main page 🏅")
 
 st.markdown("""
 # Preemptive Product Sentiment Forecasting: Understanding Customer Feelings Prior to Purchase
