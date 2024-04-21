@@ -93,5 +93,3 @@ def main(config:str,min_accuracy:float):
 
 if __name__ == "__main__":
     main()
-
-!pip install "zenml[server]"

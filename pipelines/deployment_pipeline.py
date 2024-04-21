@@ -30,7 +30,6 @@ docker_settings = DockerSettings(required_integrations=[MLFLOW])
 def dynamic_importer() -> str:
     """Downloads the latest data from a mock API."""
     data = get_data_for_test()
-    print("data>>",data)
     return data
 
 
@@ -197,7 +196,6 @@ def continuous_deployment_pipeline(
 def inference_pipeline(pipeline_name: str, pipeline_step_name: str):
     # Link all the steps artifacts together
     batch_data = dynamic_importer()
-    print("batch_data>>",batch_data)
     model_deployment_service = prediction_service_loader(
         pipeline_name=pipeline_name,
         pipeline_step_name=pipeline_step_name,
