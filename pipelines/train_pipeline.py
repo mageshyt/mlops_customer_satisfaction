@@ -9,14 +9,14 @@ from steps.evaluation import evaluate_model
 # Create a pipeline
 
 @pipeline(enable_cache=True)
-def train_pipeline(data_path:str) -> None:
+def train_pipeline() -> None:
     """
     Training pipeline.
     
     Args:
         data_path (str): path to the data source
     """
-    df=ingest_data(data_path) # Ingesting the data
+    df=ingest_data() # Ingesting the data
     # Cleaning the data
     X_train,X_test,y_train,y_test= clean_data(df)
     # Training the model

@@ -111,7 +111,6 @@ class DataSplitStrategy(DataStrategy):
         super().__init__(data)
 
     def handle_data(self) -> Union[pd.DataFrame, pd.Series]:
-
         """
         Clean the data using splitting techniques.
 
@@ -135,7 +134,7 @@ class DataSplitStrategy(DataStrategy):
             raise e
 
 
-class DataCleaninig:
+class DataCleaning:
     """
     Class for clearning data using a strategy then divide the data into training and testing sets.
     """
@@ -167,7 +166,7 @@ if __name__ == "__main__":
     data = pd.read_csv(
         "/Volumes/Project-2/programming/machine_deep_learning/projects/customer_satisfaction/data/olist_customers_dataset.csv"
     )
-    data_cleaner = DataCleaninig(data, DataPreProcessStrategy(data))
+    data_cleaner = DataCleaning(data, DataPreProcessStrategy(data))
     cleaned_data = data_cleaner.clean_data()
 
     # Split the data into training and testing sets
@@ -179,4 +178,3 @@ if __name__ == "__main__":
     print("Size of testing set:", X_test.shape)
     print("Size of training labels:", y_train.shape)
     print("Size of testing labels:", y_test.shape)
-

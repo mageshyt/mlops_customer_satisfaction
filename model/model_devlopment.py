@@ -50,8 +50,6 @@ class LinearRegressionModel(Model):
         except Exception as e:
             logging.error(f"An error occurred while developing the linear regression model: {e}")
             raise e
-        
-
 
 class RandomForestModel(Model):
     """
@@ -78,6 +76,3 @@ class RandomForestModel(Model):
             logging.error(f"An error occurred while developing the Random Forest model: {e}")
             raise e
         
-        
-
-
