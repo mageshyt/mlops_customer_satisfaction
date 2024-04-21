@@ -70,7 +70,7 @@ class MLFlowDeploymentLoaderStepConfig(BaseParameters):
 @step(enable_cache=False)
 def prediction_service_loader(
      pipeline_name: str,
-        step_name: str,
+        pipeline_step_name: str,
         running: bool=True,
         model_name: str="model",
 ) -> MLFlowDeploymentService:
@@ -79,7 +79,7 @@ def prediction_service_loader(
     Args:
         pipeline_name: name of the pipeline that deployed the MLflow prediction
             server
-        step_name: the name of the step that deployed the MLflow prediction
+        pipeline_step_name: the name of the step that deployed the MLflow prediction
             server
         running: when this flag is set, the step only returns a running service
         model_name: the name of the model that is deployed
@@ -89,14 +89,14 @@ def prediction_service_loader(
     # fetch the mlflow deployment service
     existing_services = model_deployer.find_model_server(
         pipeline_name=pipeline_name,
-        pipeline_step_name=step_name,
+        pipeline_step_name=pipeline_step_name,
         model_name=model_name,
         running=running,
     )
     if not existing_services:
         raise RuntimeError(
             f"No MLflow prediction service deployed by the "
-            f"{step_name} step in the {pipeline_name} "
+            f"{pipeline_step_name} step in the {pipeline_name} "
             f"pipeline for the '{model_name}' model is currently "
             f"running."
         )
@@ -182,11 +182,9 @@ def continuous_deployment_pipeline(
     model=model_train(X_train,X_test,y_train,y_test)
 
     r2,mae,rmse,mse=evaluate_model(model,X_test,y_test)
-    print("R2 score: ",mse)
     # r2 -> measure teh goodness of fit of the model
     deployment_decision=deployment_trigger(accuracy=mse)
-    print("Deployment decision: ",deployment_decision)
-    print("Modle: ",model)
+    
     # Deploy the model
     mlflow_model_deployer_step(
         model=model,
@@ -202,7 +200,7 @@ def inference_pipeline(pipeline_name: str, pipeline_step_name: str):
     print("batch_data>>",batch_data)
     model_deployment_service = prediction_service_loader(
         pipeline_name=pipeline_name,
-        step_name=pipeline_step_name,
+        pipeline_step_name=pipeline_step_name,
         running=False,
     )
     predictor(service=model_deployment_service, data=batch_data)

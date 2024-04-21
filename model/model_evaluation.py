@@ -8,7 +8,7 @@ class Evaluation(ABC):
     """
 
     @abstractmethod
-    def evaluate(self,  y_true:np.ndarray, y_pred:np.ndarray):
+    def evaluate(self,  y_true:np.ndarray, y_pred:np.ndarray)->float:
         """
         Evaluate the model.
 
@@ -24,8 +24,7 @@ class MSE(Evaluation):
     """
     Class for Mean Squared Error evaluation.
     """
-
-    def evaluate(self, y_true:np.ndarray, y_pred:np.ndarray):
+    def evaluate(self, y_true:np.ndarray, y_pred:np.ndarray)->float:
         """
         Evaluate the model using Mean Squared Error.
 
@@ -49,7 +48,7 @@ class MAE(Evaluation):
     Class for Mean Absolute Error evaluation.
     """
 
-    def evaluate(self, y_true:np.ndarray, y_pred:np.ndarray):
+    def evaluate(self, y_true:np.ndarray, y_pred:np.ndarray)->float:
         """
         Evaluate the model using Mean Absolute Error.
 
@@ -73,7 +72,7 @@ class R2(Evaluation):
     Class for R2 evaluation.
     """
 
-    def evaluate(self,y_true:np.ndarray, y_pred:np.ndarray):
+    def evaluate(self,y_true:np.ndarray, y_pred:np.ndarray) ->float:
         """
         Evaluate the model using R2.
 
@@ -96,7 +95,7 @@ class RMSE(Evaluation):
     Class for Root Mean Squared Error evaluation.
     """
 
-    def evaluate(self,  y_true:np.ndarray, y_pred:np.ndarray):
+    def evaluate(self,  y_true:np.ndarray, y_pred:np.ndarray)->float:
         """
         Evaluate the model using Root Mean Squared Error.
 

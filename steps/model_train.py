@@ -18,8 +18,8 @@ experiment_tracker = Client().active_stack.experiment_tracker
 def model_train(
     X_train: pd.DataFrame,
     X_test: pd.DataFrame,
-    y_train: pd.DataFrame,
-    y_test: pd.DataFrame,
+    y_train: pd.Series,
+    y_test: pd.Series,
     config:ModelNameConfig
 ) -> RegressorMixin:
     """
@@ -28,14 +28,14 @@ def model_train(
     Args:
         X_train (pd.DataFrame): Training data.
         X_test (pd.DataFrame): Testing data.
-        y_train (pd.DataFrame): Training labels.
-        y_test (pd.DataFrame): Testing labels.
+        y_train (pd.Series): Training labels.
+        y_test (pd.Series): Testing labels.
     """
     logging.info("Training the model")
     # Training the model
     model=None
 
-    if config.model_name=="LinearRegression":
+    if config.model_name=="linear":
         mlflow.sklearn.autolog()
         model=LinearRegressionModel()
         trained_mode=model.train(X_train,y_train)

@@ -37,7 +37,6 @@ def main(config:str,min_accuracy:float):
     deploy = config == DEPLOY or config == DEPLOY_AND_PREDICT
     predict = config == PREDICT or config == DEPLOY_AND_PREDICT
 
-    print(">>config is ",predict)
     if deploy:
         # continuous deployment pipeline
         continuous_deployment_pipeline(min_accuracy=min_accuracy,
@@ -94,3 +93,5 @@ def main(config:str,min_accuracy:float):
 
 if __name__ == "__main__":
     main()
+
+!pip install "zenml[server]"
