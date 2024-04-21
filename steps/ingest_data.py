@@ -8,27 +8,25 @@ from zenml import step
 
 class IngestData:
     """
-    Ingesting the data from the source.
+    Data ingestion class which ingests data from
+    the souce and returns a DataFrame
     """
 
-    def __init__(self,data_path:str) -> None:
+    def __init__(self) -> None:
         """
-
-        Args:
-            data_path (str): path to the data source
+        Initializing the data source.
         """
-
-        self.data_path = data_path
+        pass
 
     def get_data(self):
         """
         Reading the data from the source.
         """
-        logging.info(f"Reading data from {self.data_path}")
-        return pd.read_csv(self.data_path)
+        logging.info(f"Reading the data ")
+        return pd.read_csv("/Volumes/Project-2/programming/machine_deep_learning/projects/customer_satisfaction/data/olist_customers_dataset.csv")
     
 @step
-def ingest_data(data_path:str) -> pd.DataFrame:
+def ingest_data() -> pd.DataFrame:
     """
     Ingesting the data from the source.
 
@@ -39,7 +37,7 @@ def ingest_data(data_path:str) -> pd.DataFrame:
         pd.DataFrame: data from the source
     """
     try:
-        ingest_data = IngestData(data_path)
+        ingest_data = IngestData()
         return ingest_data.get_data()
     except Exception as e:
         logging.error(f"Error while ingesting data: {e}")
