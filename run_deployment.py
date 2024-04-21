@@ -2,7 +2,7 @@ from typing import cast
 from rich import print
 import click
 
-from pipelines.deployment_pipeline import continuous_deployment_pipeline
+from pipelines.deployment_pipeline import continuous_deployment_pipeline,inference_pipeline
 from zenml.integrations.mlflow.mlflow_utils import get_tracking_uri
 from zenml.integrations.mlflow.model_deployers.mlflow_model_deployer import MLFlowModelDeployer
 from zenml.integrations.mlflow.services import MLFlowDeploymentService
@@ -37,7 +37,7 @@ def main(config:str,min_accuracy:float):
     deploy = config == DEPLOY or config == DEPLOY_AND_PREDICT
     predict = config == PREDICT or config == DEPLOY_AND_PREDICT
 
-    print(">>config is ",deploy)
+    print(">>config is ",predict)
     if deploy:
         # continuous deployment pipeline
         continuous_deployment_pipeline(min_accuracy=min_accuracy,
@@ -46,25 +46,28 @@ def main(config:str,min_accuracy:float):
                                        )
     if predict:
         # continuous prediction pipeline
-        pass
+        inference_pipeline(
+            pipeline_name="continuous_deployment_pipeline",
+            pipeline_step_name="mlflow_model_deployer_step",
+        )
     print(
         "You can run:\n "
         f"[italic green]    mlflow ui --backend-store-uri '{get_tracking_uri()}"
         "[/italic green]\n ...to inspect your experiment runs within the MLflow"
-        " UI.\nYou can find your runs tracked within the "
+        " UI.\nYou can f ind your runs tracked within the "
         "`mlflow_example_pipeline` experiment. There you'll also be able to "
         "compare two or more runs.\n\n"
     )
 
 
-
+    
     # fetch existing services with same pipeline name, step name and model name
     existing_services = mlflow_model_deployer_component.find_model_server(
         pipeline_name="continuous_deployment_pipeline",
         pipeline_step_name="mlflow_model_deployer_step",
         model_name="model",
     )
-    # template from the mlflow_model_deployer_step [zeml]
+
     if existing_services:
         service = cast(MLFlowDeploymentService, existing_services[0])
         if service.is_running:
