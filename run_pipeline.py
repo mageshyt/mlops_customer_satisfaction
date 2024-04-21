@@ -12,4 +12,4 @@ if __name__ == '__main__':
         "experiment. Here you'll also be able to compare the two runs.)"
     )
 
-    train_pipeline(data_path='/Volumes/Project-2/programming/machine_deep_learning/projects/customer_satisfaction/data/olist_customers_dataset.csv')
+    train_pipeline()
