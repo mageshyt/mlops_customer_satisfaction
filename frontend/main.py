@@ -7,9 +7,7 @@ st.set_page_config(page_title="Customer Satification", page_icon=":shark:", layo
 
 st.sidebar.markdown("# Main page 🏅")
 
-st.markdown("""
-# Preemptive Product Sentiment Forecasting: Understanding Customer Feelings Prior to Purchase
-""")
+st.title("End to End Customer Satisfaction Pipeline with ZenML")
 
 st.image('./assets/high_level_overview.png', caption='Training overview', use_column_width=True)    
 st.markdown("""
