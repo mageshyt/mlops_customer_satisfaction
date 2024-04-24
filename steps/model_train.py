@@ -7,7 +7,7 @@ import mlflow
 
 import pandas as pd
 from sklearn.base import RegressorMixin
-from model.model_devlopment import LinearRegressionModel,RandomForestModel,XGBoostModel,HyperparameterTuner
+from model.model_devlopment import LinearRegressionModel,RandomForestModel,XGBoostModel,HyperparameterTuner,AdaBoostModel
 
 from  .config import ModelNameConfig
 
@@ -46,6 +46,10 @@ def model_train(
         elif config.model_name == "linear_regression":
             mlflow.sklearn.autolog()
             model = LinearRegressionModel()
+        elif config.model_name == "adaboost":
+            mlflow.sklearn.autolog()
+            model = AdaBoostModel()
+            
         else:
                 raise ValueError(f"Invalid model type: {config.model_name}")
             

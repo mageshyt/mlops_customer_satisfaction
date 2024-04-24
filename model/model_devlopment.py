@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 
 from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor,AdaBoostRegressor
 
 import optuna
 import pandas as pd
@@ -102,6 +102,25 @@ class XGBoostModel(Model):
         learning_rate = trial.suggest_loguniform("learning_rate", 1e-7, 10.0)
         reg = self.train(x_train, y_train, n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth)
         return reg.score(x_test, y_test)
+
+
+class  AdaBoostModel(Model):
+    """
+    AdaBoostModel that implements the Model interface.
+    """
+    
+    def train(self, x_train, y_train, **kwargs):
+        reg = AdaBoostRegressor(**kwargs)
+        reg.fit(x_train, y_train)
+        return reg
+    
+    def optimize(self, trial, x_train, y_train, x_test, y_test):
+        n_estimators = trial.suggest_int("n_estimators", 1, 200)
+        learning_rate = trial.suggest_loguniform("learning_rate", 1e-7, 10.0)
+        reg = self.train(x_train, y_train, n_estimators=n_estimators, learning_rate=learning_rate)
+        return reg.score(x_test, y_test)
+    
+    
 
 
 class HyperparameterTuner:

@@ -3,6 +3,9 @@ from PIL import Image
 
 st.set_page_config(page_title="Customer Satification", page_icon=":shark:", layout="wide")
 
+
+ROOT_PATH = "/Volumes/Project-2/programming/machine_deep_learning/projects/customer_satisfaction/frontend/assets/"
+
 # create sidebar
 
 st.sidebar.markdown("# Main page 🏅")

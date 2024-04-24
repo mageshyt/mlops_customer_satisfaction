@@ -7,18 +7,17 @@ import plotly.figure_factory as ff
 import plotly.express as px
 import numpy as np
 
+from main import ROOT_PATH
+
 st.info("This is a demo application written to show how to our deeplearing model can be used to predict customer satisfaction scores .")
 st.title("Explore Data Analysis 📊")
 
 st.sidebar.title("EDA")
 
-ROOT_PATH = "/Volumes/Project-2/programming/machine_deep_learning/projects/customer_satisfaction/frontend/assets/"
 
 st.image("https://pianalytix.com/wp-content/uploads/2020/11/Exploratory-Data-Analysis.jpg")
 
-df=pd.read_csv(ROOT_PATH+"csv/processed_olist_customers_dataset.csv",
-
-               )   
+df=pd.read_csv(ROOT_PATH+"csv/processed_olist_customers_dataset.csv",)   
 
 
 st.dataframe(df)
@@ -45,11 +44,14 @@ most_used_payment=payment_type['index'][0]
 
 st.write(f"Most used payment type is {most_used_payment}")
 
-sns.set_palette("pastel")
-plt.pie(payment_type['payment_type'],labels=payment_type['index'],autopct='%1.1f%%')
+# sns.set_palette("pastel")
+# plt.pie(payment_type['payment_type'],labels=payment_type['index'],autopct='%1.1f%%')
 
-plt.title("Payment Type Distribution")
-st.pyplot(plt)
+# plt.title("Payment Type Distribution")
+# st.pyplot(plt)
+fig=px.pie(payment_type,values='payment_type',names='index')
+
+st.plotly_chart(fig)
 st.divider()
 # Plot 3: Order Value Distribution
 st.subheader("3. Order Value Distribution")
