@@ -33,19 +33,29 @@ If you are running the `run_deployment.py` script, you will also need to install
 The project can only be executed with a ZenML stack that has an MLflow experiment tracker and model deployer as a component. Configuring a new stack with the two components are as follows:
 
 ```bash
-    zenml integration install mlflow -y
-    zenml experiment-tracker register mlflow_tracker --flavor=mlflow
-    zenml model-deployer register mlflow --flavor=mlflow
-    zenml stack register mlflow_stack -a default -o default -d mlflow -e mlflow_tracker --set-default
+zenml integration install mlflow -y
+zenml experiment-tracker register mlflow_tracker --flavor=mlflow
+zenml model-deployer register mlflow --flavor=mlflow
+zenml stack register mlflow_stack -a default -o default -d mlflow -e mlflow_tracker --set
 ```
 
+## 📙 Resources & References
 
-## 👍🏻 Solution:
-To effectively predict customer satisfaction scores for future orders or purchases, a single model training isn't sufficient. We've devised an end-to-end pipeline for continuously predicting and deploying machine learning models. This pipeline, along with a data application, ensures that the latest model is utilized for business consumption. ZenML facilitates building such pipelines easily and powerfully. Special emphasis is placed on the MLflow integration of ZenML, utilizing MLflow tracking and deployment alongside Streamlit for real-world usage.
+We had written a blog that explains this project in-depth: [Predicting how a customer will feel about a product before they even ordered it](https://blog.zenml.io/customer_satisfaction/).
 
-        
+If you'd like to watch the video that explains the project, you can watch the [video](https://youtu.be/L3_pFTlF9EQ).
 
-### 🤖 Training Pipeline
+## :thumbsup: The Solution
+
+In order to build a real-world workflow for predicting the customer satisfaction score for the next order or purchase (which will help make better decisions), it is not enough to just train the model once.
+
+Instead, we are building an end-to-end pipeline for continuously predicting and deploying the machine learning model, alongside a data application that utilizes the latest deployed model for the business to consume.
+
+This pipeline can be deployed to the cloud, scale up according to our needs, and ensure that we track the parameters and data that flow through every pipeline that runs. It includes raw data input, features, results, the machine learning model and model parameters, and prediction outputs. ZenML helps us to build such a pipeline in a simple, yet powerful, way.
+
+In this Project, we give special consideration to the [MLflow integration](https://github.com/zenml-io/zenml/tree/main/examples) of ZenML. In particular, we utilize MLflow tracking to track our metrics and parameters, and MLflow deployment to deploy our model. We also use [Streamlit](https://streamlit.io/) to showcase how this model will be used in a real-world setting.
+
+### Training Pipeline
 
 Our standard training pipeline consists of several steps:
 

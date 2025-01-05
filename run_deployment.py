@@ -42,6 +42,7 @@ def main(config:str,min_accuracy:float):
         continuous_deployment_pipeline(min_accuracy=min_accuracy,
                                         workers=3,
                                         timeout=60,
+                                        
                                        )
     if predict:
         # continuous prediction pipeline
