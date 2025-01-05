@@ -12,10 +12,9 @@ df=pd.read_csv(ROOT_PATH+"csv/processed_olist_customers_dataset.csv",)
 
 st.dataframe(df)
 
-# pr = ProfileReport(df)
-# pr.to_file('output.html')
+pr = ProfileReport(df)
 
-# st_profile_report(pr,)
+st_profile_report(pr,)
 
 
 
