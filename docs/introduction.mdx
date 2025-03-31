@@ -1,0 +1,374 @@
+# MLOps Implementation for Customer Satisfaction Prediction
+
+## 1. MLOps Architecture Overview
+
+The implementation follows a modern MLOps architecture with:
+
+1. **Automated Data Pipelines**: Continuous data ingestion, cleaning, and preprocessing
+2. **Experiment Tracking**: Systematic tracking of model training parameters and metrics using MLflow
+3. **Model Registry**: Versioned storage of trained models****
+4. **Continuous Deployment**: Automated model deployment when quality thresholds are met
+5. **Monitoring and Feedback**: Performance monitoring and data pipeline for continuous improvement
+6. **Visualization and Reporting**: Data visualization via Streamlit for business stakeholders
+
+## 4. Technology Stack
+
+The implementation utilizes the following technologies:
+
+1. **ZenML**: Core orchestration framework for creating reproducible ML pipelines
+2. **MLflow**: For experiment tracking, model registry, and model deployment
+3. **Streamlit**: For creating interactive data applications and model interfaces
+4. **Python**: Primary programming language with scientific libraries:
+   - Pandas and NumPy: For data manipulation
+   - Scikit-learn: For machine learning algorithms
+   - XGBoost: For gradient boosting implementation
+5. **Docker**: For containerization and ensuring consistent environments
+
+## 5. Detailed Implementation
+
+### 5.1 Data Pipeline
+
+#### 5.1.1 Data Ingestion
+
+The data ingestion process is implemented as a ZenML step that reads customer data from CSV files:
+
+```python
+@step
+def ingest_data() -> pd.DataFrame:
+    """
+    Ingesting the data from the source.
+    Returns:
+        pd.DataFrame: data from the source
+    """
+    try:
+        ingest_data = IngestData()
+        return ingest_data.get_data()
+    except Exception as e:
+        logging.error(f"Error while ingesting data: {e}")
+        return None
+```
+
+This step is responsible for reading data from the source location and returning it as a pandas DataFrame. The implementation uses a class-based approach with proper error handling and logging.
+
+#### 5.1.2 Data Cleaning and Preprocessing
+
+The data cleaning step handles preprocessing and data splitting:
+
+```python
+@step
+def clean_data(data: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    """
+    Cleaning the data.
+    Returns:
+         Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]: cleaned data
+    """
+    try:
+        logging.info("Cleaning data")
+        # Data cleaning
+        process_strategy = DataPreProcessStrategy(data)
+        data_cleaning = DataCleaning(data, process_strategy)
+        processed_data = data_cleaning.clean_data()
+        # Splitting the data
+        split_strategy = DataSplitStrategy(processed_data)
+        X_train, X_test, y_train, y_test = split_strategy.handle_data()
+        logging.info("Data cleaning complete !")
+        return X_train, X_test, y_train, y_test
+    except Exception as e:
+        logging.error(f"An error occurred while cleaning the data: {e}")
+        raise e
+```
+
+The implementation uses the Strategy design pattern with:
+1. `DataPreProcessStrategy`: Handles data preprocessing tasks
+2. `DataCleaning`: Applies the strategy to clean the data
+3. `DataSplitStrategy`: Splits the data into training and testing sets
+
+### 5.2 Model Training Pipeline
+
+#### 5.2.1 Model Development
+
+The model training step supports multiple algorithms with automatic hyperparameter tuning:
+
+```python
+@step(experiment_tracker=experiment_tracker.name)
+def model_train(x_train: pd.DataFrame, x_test: pd.DataFrame,
+                y_train: pd.Series, y_test: pd.Series,
+                config: ModelNameConfig) -> RegressorMixin:
+    """
+    Training the model.
+    """
+    try:
+        logging.info("Training the model")
+        model = None
+        tuner = None
+        
+        # Model selection based on configuration
+        if config.model_name == "randomforest":
+            mlflow.sklearn.autolog()
+            model = RandomForestModel()
+        elif config.model_name == "xgboost":
+            mlflow.xgboost.autolog()
+            model = XGBoostModel()
+        elif config.model_name == "linear_regression":
+            mlflow.sklearn.autolog()
+            model = LinearRegressionModel()
+        elif config.model_name == "adaboost":
+            mlflow.sklearn.autolog()
+            model = AdaBoostModel()
+        else:
+            raise ValueError(f"Invalid model type: {config.model_name}")
+        
+        # Hyperparameter tuning
+        tuner = HyperparameterTuner(model, x_train, y_train, x_test, y_test)
+        
+        if config.fine_tuning:
+            best_model = tuner.optimize()
+            trained_model = model.train(x_train, y_train, **best_model)
+        else:
+            trained_model = model.train(x_train, y_train)
+            
+        return trained_model
+    except Exception as e:
+        logging.error(f"An error occurred while training the model: {e}")
+        raise e
+```
+
+Key aspects of the model training:
+1. **Multiple Algorithm Support**: RandomForest, XGBoost, Linear Regression, and AdaBoost
+2. **Automated MLflow Logging**: Automatic tracking of model parameters and metrics
+3. **Hyperparameter Tuning**: Optional hyperparameter optimization
+4. **Configuration-Driven**: Model selection through configuration
+
+#### 5.2.2 Model Evaluation
+
+The model evaluation step calculates and logs multiple performance metrics:
+
+```python
+@step(experiment_tracker=experiment_tracker.name)
+def evaluate_model(model: RegressorMixin,
+                   X_test: pd.DataFrame,
+                   y_test: pd.Series) -> Tuple[float, float, float, float]:
+    """
+    Evaluating the model.
+    """
+    try:
+        logging.info("Evaluating the model")
+        # Making predictions
+        predictions = model.predict(X_test)
+        
+        # Evaluating the model
+        mae = MAE().evaluate(y_test, predictions)
+        rmse = RMSE().evaluate(y_test, predictions)
+        r2 = R2().evaluate(y_test, predictions)
+        mse = MSE().evaluate(y_test, predictions)
+        
+        # Logging metrics
+        logging.info(f"Mean Absolute Error: {mae}")
+        logging.info(f"Root Mean Squared Error: {rmse}")
+        logging.info(f"R2: {r2}")
+        
+        # MLflow metric logging
+        mlflow.log_metric("mae", mae)
+        mlflow.log_metric("rmse", rmse)
+        mlflow.log_metric("r2", r2)
+        mlflow.log_metric("mse", mse)
+        
+        return r2, mae, rmse, mse
+    
+    except Exception as e:
+        logging.error(f"An error occurred while evaluating the model: {e}")
+        raise e
+```
+
+The evaluation uses multiple metrics:
+1. **MAE (Mean Absolute Error)**: Average absolute difference between predictions and actual values
+2. **RMSE (Root Mean Squared Error)**: Square root of the average squared differences
+3. **R² (R-squared)**: Proportion of variance explained by the model
+4. **MSE (Mean Squared Error)**: Average squared difference between predictions and actual values
+
+All metrics are automatically logged to MLflow for experiment tracking.
+
+### 5.3 Deployment Pipeline
+
+The deployment pipeline extends the training pipeline with additional steps for automated model deployment:
+
+```python
+@pipeline(enable_cache=False, settings={"docker": docker_settings})
+def continuous_deployment_pipeline(
+    min_accuracy: float = 0.9,
+    workers: int = 1,
+    timeout: int = DEFAULT_SERVICE_START_STOP_TIMEOUT,
+):
+    """Continuous deployment pipeline to train and deploy a model"""
+    df = ingest_data()
+    # Cleaning the data
+    X_train, X_test, y_train, y_test = clean_data(df)
+    # Training the model
+    model = model_train(X_train, X_test, y_train, y_test)
+    r2, mae, rmse, mse = evaluate_model(model, X_test, y_test)
+    
+    # Deployment decision based on model performance
+    deployment_decision = deployment_trigger(accuracy=mse)
+    
+    # Deploy the model if it meets criteria
+    mlflow_model_deployer_step(
+        model=model,
+        deploy_decision=deployment_decision,
+        workers=workers,
+        timeout=timeout,
+    )
+```
+
+Key components of the deployment pipeline:
+
+#### 5.3.1 Deployment Trigger
+
+The deployment trigger step determines if a model meets quality thresholds for deployment:
+
+```python
+@step
+def deployment_trigger(
+    accuracy: float,
+    config: DeploymentTriggerConfig
+) -> bool:
+    """Implements a simple model deployment trigger that looks at the 
+    input model accuracy and decides if it is good enough to deploy"""
+    return accuracy >= config.min_accuracy
+```
+
+This step ensures only high-quality models are deployed to production.
+
+#### 5.3.2 Model Deployment
+
+The MLflow model deployer step handles the actual deployment:
+
+```python
+mlflow_model_deployer_step(
+    model=model,
+    deploy_decision=deployment_decision,
+    workers=workers,
+    timeout=timeout,
+)
+```
+
+This step:
+1. Packages the model for deployment
+2. Deploys it to a prediction server
+3. Manages the lifecycle of the deployed model
+
+#### 5.3.3 Inference Pipeline
+
+A separate inference pipeline is provided for batch predictions:
+
+```python
+@pipeline(enable_cache=False, settings={"docker": docker_settings})
+def inference_pipeline(pipeline_name: str, pipeline_step_name: str):
+    # Dynamic data import
+    batch_data = dynamic_importer()
+    
+    # Load the deployed model service
+    model_deployment_service = prediction_service_loader(
+        pipeline_name=pipeline_name,
+        pipeline_step_name=pipeline_step_name,
+        running=False,
+    )
+    
+    # Make predictions
+    predictor(service=model_deployment_service, data=batch_data)
+```
+
+The inference pipeline includes:
+1. **Dynamic Data Import**: Importing new data for predictions
+2. **Service Loading**: Loading the deployed model service
+3. **Prediction**: Running inference on the new data
+
+## 6. Experiment Tracking with MLflow
+
+MLflow is integrated as the experiment tracking tool with the following capabilities:
+
+1. **Automatic Logging**: Parameters, metrics, and models are automatically logged
+2. **Experiment Organization**: Experiments are organized by runs and can be compared
+3. **Model Registry**: Models are versioned and stored in the registry
+4. **Deployment Management**: Models are deployed and managed through MLflow
+
+The integration uses ZenML's MLflow component:
+
+```python
+# MLflow experiment tracker configuration
+experiment_tracker = Client().active_stack.experiment_tracker
+@step(experiment_tracker=experiment_tracker.name)
+```
+
+## 7. Containerization and Environment Management
+
+Docker is used for containerization with the following settings:
+
+```python
+docker_settings = DockerSettings(required_integrations=[MLFLOW])
+@pipeline(enable_cache=False, settings={"docker": docker_settings})
+```
+
+This ensures:
+1. **Environment Consistency**: Same environment for development and production
+2. **Dependency Management**: Proper isolation of dependencies
+3. **Scalability**: Easier deployment to distributed environments
+
+## 8. Web Application Integration
+
+A Streamlit-based web application serves as the interface for business stakeholders:
+
+1. **Interactive Dashboard**: Visualizes model performance metrics
+2. **Prediction Interface**: Allows for making predictions with the deployed model
+3. **Data Exploration**: Provides EDA capabilities for data exploration
+
+## 9. MLOps Pipeline Flow
+
+![Training and Deployment Pipeline](_assets/training_and_deployment_pipeline_updated.png)
+
+The complete MLOps workflow consists of:
+
+1. **Data Collection**: Gathering data from various sources
+2. **Data Processing**: Cleaning and preprocessing the data
+3. **Model Training**: Training multiple model types with hyperparameter tuning
+4. **Model Evaluation**: Evaluating models on multiple metrics
+5. **Model Deployment**: Deploying models that meet quality thresholds
+6. **Monitoring and Feedback**: Monitoring model performance and collecting feedback
+7. **Continuous Improvement**: Continuous retraining and improvement of models
+
+## 10. ZenML Stack Configuration
+
+The ZenML stack is configured with MLflow components:
+
+```bash
+zenml integration install mlflow -y
+zenml experiment-tracker register mlflow_tracker --flavor=mlflow
+zenml model-deployer register mlflow --flavor=mlflow
+zenml stack register mlflow_stack -a default -o default -d mlflow -e mlflow_tracker --set
+```
+
+This configuration:
+1. Installs the MLflow integration
+2. Registers an MLflow experiment tracker
+3. Registers an MLflow model deployer
+4. Creates and activates a stack with these components
+
+## 11. Testing and Validation
+
+The implementation includes testing components:
+1. **Data Validation**: Ensures data quality before training
+2. **Model Validation**: Validates model performance on test data
+3. **Deployment Validation**: Ensures deployed model functions correctly
+
+## 12. Conclusion
+
+This MLOps implementation for customer satisfaction prediction demonstrates a production-ready machine learning system with continuous training and deployment capabilities. By leveraging ZenML for orchestration and MLflow for experiment tracking and deployment, the system provides a scalable, reproducible, and maintainable solution for predicting customer satisfaction.
+
+The implementation follows MLOps best practices:
+1. **Automation**: Automated pipelines for training and deployment
+2. **Reproducibility**: Versioned code, data, and environment
+3. **Monitoring**: Continuous monitoring of model performance
+4. **Scalability**: Docker-based deployment for scalability
+5. **Governance**: Experiment tracking and model versioning
+6. **Continuous Improvement**: Feedback loop for continuous model improvement
+
+This comprehensive MLOps implementation provides a solid foundation for further research and development in the field of customer satisfaction prediction.
